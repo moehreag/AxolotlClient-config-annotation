@@ -1,0 +1,17 @@
+[versions]
+# The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
+minecraft = "1.19.3"
+quilt_mappings = "1.19.3+build.2"
+quilt_loader = "0.17.7"
+
+config = "1.0.15+1.19.3"
+
+[libraries]
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
+quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }
+
+axolotlclient_config = { module = "io.github.axolotlclient:AxolotlClient-config", version.ref = "config" }
+
+[plugins]
+quilt_loom = { id = "org.quiltmc.loom", version = "1.0.+" }
