@@ -2,13 +2,13 @@
 	"schema_version": 1,
 	"quilt_loader": {
 		"group": "com.example",
-		"id": "example_mod",
+		"id": "axolotlclient-annotationconfig",
 		"version": "${version}",
 		"metadata": {
-			"name": "Mod Name",
-			"description": "A short description of your mod.",
+			"name": "AxolotlClient-config Annotation addon",
+			"description": "Addon for AxolotlClient-config for simple annotation-based configs.",
 			"contributors": {
-				"Your name here": "Owner"
+				"moehreag": "Owner"
 			},
 			"contact": {
 				"homepage": "https://example.com/",
@@ -19,8 +19,7 @@
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"client_init": "io.github.axolotlclient.config.annotation.ExampleAnnotationConfigInitializer",
-			"modmenu": "io.github.axolotlclient.config.annotation.ModmenuIntegration"
+			"client_init": "io.github.axolotlclient.config.annotation.ExampleAnnotationConfigInitializer"
 		},
 		"depends": [
 			{

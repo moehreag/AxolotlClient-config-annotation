@@ -32,10 +32,10 @@ dependencies {
 	modImplementation libs.axolotlclient.config
 	include libs.axolotlclient.config
 
-	modImplementation("io.github.axolotlclient:AxolotlClient-config:1.0.15+1.19.3")
+	modImplementation("io.github.axolotlclient:AxolotlClient-config:1.0.17+1.19.3")
 
-	// this is only on our mavenLocal until now
-	modImplementation("io.github.axolotlclient:AxolotlClient-modmenu:1.1.0+1.19.3")
+	// this is only on our mavenLocal until now. No, this is not ideal.
+	modImplementation("io.github.axolotlclient:AxolotlClient-modmenu:1.1.1+1.19.3")
 }
 
 processResources {
@@ -61,7 +61,7 @@ java {
 
 	// If this mod is going to be a library, then it should also generate Javadocs in order to aid with development.
 	// Uncomment this line to generate them.
-	// withJavadocJar()
+	withJavadocJar()
 }
 
 jar {
