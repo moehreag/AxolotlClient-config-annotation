@@ -6,7 +6,7 @@ import io.github.axolotlclient.AxolotlclientConfig.AxolotlClientConfigManager;
 import net.minecraft.client.MinecraftClient;
 
 /**
- * This class feeds modmenu the
+ * This class feeds modmenu the example menu.
  */
 
 /*public class ModmenuIntegration implements ModMenuApi {

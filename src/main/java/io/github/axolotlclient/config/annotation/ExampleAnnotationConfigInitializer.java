@@ -2,6 +2,7 @@ package io.github.axolotlclient.config.annotation;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.quiltmc.loader.api.ModContainer;
+import org.quiltmc.loader.api.QuiltLoader;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 
 /**
@@ -15,6 +16,8 @@ public class ExampleAnnotationConfigInitializer implements ClientModInitializer 
 
 	@Override
 	public void onInitializeClient(ModContainer mod) {
-		configName = AxolotlClientAnnotationConfigManager.registerConfig(ExampleAnnotationConfig.class);
+		if(QuiltLoader.isDevelopmentEnvironment()) {
+			configName = AxolotlClientAnnotationConfigManager.registerConfig(ExampleAnnotationConfig.class);
+		}
 	}
 }
