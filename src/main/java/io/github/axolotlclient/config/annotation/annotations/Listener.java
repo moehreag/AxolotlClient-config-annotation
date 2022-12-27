@@ -18,7 +18,7 @@ public @interface Listener {
 	 * @return A method name in the same class as this field, it will be called when the option related to this field changes.
 	 *  The method has to have the structure of
 	 *  {@code
-	 *      void method(){
+	 *      void method(<type of your field> newValue){
 	 *          ...
 	 *      }
 	 *  }

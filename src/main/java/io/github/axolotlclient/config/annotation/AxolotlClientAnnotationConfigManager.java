@@ -5,11 +5,11 @@ import io.github.axolotlclient.AxolotlclientConfig.Color;
 import io.github.axolotlclient.AxolotlclientConfig.ConfigHolder;
 import io.github.axolotlclient.AxolotlclientConfig.options.*;
 import io.github.axolotlclient.config.annotation.annotations.*;
-import io.github.axolotlclient.util.Logger;
 import org.quiltmc.loader.api.QuiltLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -19,6 +19,8 @@ import java.util.*;
 public class AxolotlClientAnnotationConfigManager {
 
 	private static final Map<Class<?>, OptionCategory> annotationconfigs = new HashMap<>();
+	private static final Set<Class<?>> intializedConfigs = new HashSet<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(AxolotlClientAnnotationConfigManager.class);
 
 	/**
 	 * Register a config class with Annotation support
@@ -36,12 +38,13 @@ public class AxolotlClientAnnotationConfigManager {
 					config.getSimpleName() : config.getAnnotation(Config.class).name();
 		} else name = config.getSimpleName();
 
-		if(!QuiltLoader.isModLoaded(name)){
-			Logger.debug("(Annotation Addon / Debug) Config "+name+" does not have a mod with the same id. Automatic Modmenu integration will not work.\n" +
+		if(!QuiltLoader.isModLoaded(name) && QuiltLoader.isDevelopmentEnvironment()){
+			LOGGER.debug("(Annotation Addon / Debug) Config "+name+" does not have a mod with the same id. Automatic Modmenu integration will not work.\n" +
 					"This message will not be shown in a production environment.");
 		}
 
-		annotationconfigs.put(config, generateCategory(name, config));
+		OptionCategory category = generateCategory(name, config, config);
+		annotationconfigs.put(config, category);
 		AxolotlClientConfigManager.registerConfig(name, new ConfigHolder() {
 			@Override
 			public List<OptionCategory> getCategories() {
@@ -49,15 +52,16 @@ public class AxolotlClientAnnotationConfigManager {
 			}
 		});
 
+		intializedConfigs.add(config);
 		return name;
 	}
 
-	private static OptionCategory generateCategory(String name, Class<?> clazz){
+	private static OptionCategory generateCategory(String name, Class<?> clazz, Class<?> orig){
 		OptionCategory category = new OptionCategory(name);
 
 		for(Field f : clazz.getDeclaredFields()){
 			if(f.getDeclaringClass().equals(clazz)) {
-				Option<?> o = getOption(f);
+				Option<?> o = getOption(f, orig);
 				if(o != null){
 					category.add(o);
 				}
@@ -68,58 +72,65 @@ public class AxolotlClientAnnotationConfigManager {
 			if(c.isEnum()){
 				category.add(new EnumOption(c.getSimpleName(), c.getEnumConstants(), null));
 			} else {
-				category.add(generateCategory(c.getSimpleName(), c));
+				category.add(generateCategory(c.getSimpleName(), c, orig));
 			}
 		}
 
 		return category;
 	}
 
-	private static Option<?> getOption(Field field){
+	private static Option<?> getOption(Field field, Class<?> clazz){
 		try {
-			System.out.println(field.getType().getSimpleName());
-			System.out.println(field.getName());
+			field.setAccessible(true);
 
 			if (field.getType().getSimpleName().equalsIgnoreCase("boolean")) {
-				return new BooleanOption(field.getName(), value -> setField(field, value), field.getBoolean(null));
+				return new BooleanOption(field.getName(), value -> setField(field, value, clazz), field.getBoolean(null));
 			} else if (field.getType().getSimpleName().equalsIgnoreCase("string")){
-				return new StringOption(field.getName(), value -> setField(field, value), (String) field.get(null));
+				return new StringOption(field.getName(), value -> setField(field, value, clazz), (String) field.get(null));
 			} else if (field.getType()
 					.getSimpleName().toLowerCase(Locale.ROOT).contains("int")){
 				if(field.isAnnotationPresent(IntRange.class)){
-					return new IntegerOption(field.getName(), value -> setField(field, value), (Integer) field.get(null), field.getAnnotation(IntRange.class).min(), field.getAnnotation(IntRange.class).max());
+					return new IntegerOption(field.getName(), value -> setField(field, value, clazz), (Integer) field.get(null), field.getAnnotation(IntRange.class).min(), field.getAnnotation(IntRange.class).max());
 				}
-				return new IntegerOption(field.getName(), value -> setField(field, value), (Integer) field.get(null), getSliderDefaultMin(), getSliderDefaultMax());
+				return new IntegerOption(field.getName(), value -> setField(field, value, clazz), (Integer) field.get(null), getSliderDefaultMin(), getSliderDefaultMax());
 			} else if (field.getType().getSimpleName().equalsIgnoreCase("float")){
 				if(field.isAnnotationPresent(FloatRange.class)){
-					return new FloatOption(field.getName(), value -> setField(field, value), (Float) field.get(null), field.getAnnotation(FloatRange.class).min(), field.getAnnotation(FloatRange.class).max());
+					return new FloatOption(field.getName(), value -> setField(field, value, clazz), (Float) field.get(null), field.getAnnotation(FloatRange.class).min(), field.getAnnotation(FloatRange.class).max());
 				}
-				return new FloatOption(field.getName(), value -> setField(field, value), (Float) field.get(null), (float) getSliderDefaultMin(), (float) getSliderDefaultMax());
+				return new FloatOption(field.getName(), value -> setField(field, value, clazz), (Float) field.get(null), (float) getSliderDefaultMin(), (float) getSliderDefaultMax());
 			} else if (field.getType().getSimpleName().equalsIgnoreCase("double")){
 				if(field.isAnnotationPresent(DoubleRange.class)){
-					return new DoubleOption(field.getName(), value -> setField(field, value), (Double) field.get(null), field.getAnnotation(DoubleRange.class).min(), field.getAnnotation(DoubleRange.class).max());
+					return new DoubleOption(field.getName(), value -> setField(field, value, clazz), (Double) field.get(null), field.getAnnotation(DoubleRange.class).min(), field.getAnnotation(DoubleRange.class).max());
 				}
-				return new DoubleOption(field.getName(), value -> setField(field, value), (Double) field.get(null), getSliderDefaultMin(), getSliderDefaultMax());
+				return new DoubleOption(field.getName(), value -> setField(field, value, clazz), (Double) field.get(null), getSliderDefaultMin(), getSliderDefaultMax());
 			} else if (field.get(null) instanceof Color){
-				return new ColorOption(field.getName(), value -> setField(field, value), (Color) field.get(null));
+				return new ColorOption(field.getName(), value -> setField(field, value, clazz), (Color) field.get(null));
 			}
 		} catch (Exception e){
-			e.printStackTrace();
+			LOGGER.warn("Unsupported field in config class "+clazz.getName()+": "+field.getName());
+			//e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static <T> void setField(Field field, T value) {
-		if (annotationconfigs.containsKey(field.)) {
+	private static <T> void setField(Field field, T value, Class<?> configClass) {
+		if (intializedConfigs.contains(configClass)) {
 			try {
-				System.out.println("Setting field " + field.getName() + " to " + value);
 				field.set(null, value);
-
 				if (field.isAnnotationPresent(Listener.class)) {
-					field.getDeclaringClass().getDeclaredMethod(field.getAnnotation(Listener.class).value()).invoke(null);
+					try {
+
+
+						field.getDeclaringClass().getDeclaredMethod(field.getAnnotation(Listener.class).value(), field.getType()).invoke(null, value);
+					} catch (ReflectiveOperationException e){
+						LOGGER.error("Listener Method "+field.getAnnotation(Listener.class)+" could not be found or has the wrong parameters!");
+					}
 				}
-			} catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-				throw new RuntimeException(e);
+				if(!field.get(null).equals(value)){
+					LOGGER.error("Field "+field.getName()+" could not be set to its new value!");
+				}
+			} catch (IllegalAccessException e) {
+				LOGGER.error("Field "+field.getName()+" could not be set to its new value!");
 			}
 		}
 	}

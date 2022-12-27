@@ -24,8 +24,8 @@ public class ExampleAnnotationConfig {
 	@Listener("floatListener")
 	public static float exampleFloatListener = 0.23F;
 
-	public static void floatListener(){
-		System.out.println("Value changed to: "+exampleFloatListener);
+	public static void floatListener(float value){
+		System.out.println("Value changed to: "+value);
 	}
 
 	public enum exampleEnum {
@@ -44,8 +44,9 @@ public class ExampleAnnotationConfig {
 		@IntRange(max = 45, min = 6)
 		public static Integer exampleIntegerRange = 32;
 
-		public static void exampleMethod(){
-			System.out.println("Value changed to: "+exampleBoolean);
+		public static void exampleMethod(boolean value){
+			System.out.println("Value changed to: "+value);
+			System.out.println("Value of the field: "+exampleBooleanListener);
 		}
 	}
 }
