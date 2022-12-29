@@ -9,7 +9,7 @@ import io.github.axolotlclient.config.annotation.annotations.Listener;
  * An example config class showing how to use this addition to the library.
  */
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "java"})
 @Config(name = "axolotlclient-annotationconfig")
 public class ExampleAnnotationConfig {
 
@@ -29,6 +29,14 @@ public class ExampleAnnotationConfig {
 	}
 
 	public ExampleAnnotationConfigEnum exampleEnum = ExampleAnnotationConfigEnum.EXAMPLE_ENUM1;
+
+    public EnclosedEnum enclosedEnum = EnclosedEnum.ENCLOSED_ENUM3;
+    public enum EnclosedEnum {
+        ENCLOSED_ENUM1,
+        ENCLOSED_ENUM2,
+        ENCLOSED_ENUM3,
+        ENCLOSED_ENUM4
+    }
 
 	public exampleClass exampleClass = new exampleClass();
 

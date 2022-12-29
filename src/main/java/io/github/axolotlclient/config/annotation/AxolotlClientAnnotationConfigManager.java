@@ -17,14 +17,15 @@ import java.util.*;
  * The main class for registering a simple, annotation-based config class.
  */
 
-public class AxolotlClientAnnotationConfigManager {
+public class AxolotlClientAnnotationConfigManager extends AxolotlClientConfigManager {
 
 	private static final Set<Object> intializedConfigs = new HashSet<>();
 	private static final Logger LOGGER = LoggerFactory.getLogger(AxolotlClientAnnotationConfigManager.class);
 
 	/**
 	 * Register a config class with Annotation support
-	 * @param config the config class
+	 * @param config the config class Class
+     * @param <C> The config class
 	 * @return the name used to handle config operations with {@link AxolotlClientConfigManager} for this config.
 	 * Should be your mod's modid for automatic modmenu integration
 	 */
@@ -63,7 +64,7 @@ public class AxolotlClientAnnotationConfigManager {
 
 		for (Field f : clazz.getDeclaredFields()) {
 			try {
-				if (f.getType().getEnclosingClass() != null && f.getType().getEnclosingClass().equals(declaringClass.getClass())){
+				if (f.getType().getEnclosingClass() != null && f.getType().getEnclosingClass().equals(declaringClass.getClass()) && !f.getType().isEnum()){
 					category.add(generateCategory(f.getName(), f.getType(), conf, f.get(declaringClass)));
 				} else if (f.getDeclaringClass().equals(clazz)) {
 					Option<?> o = getOption(f, declaringClass, conf);
@@ -154,10 +155,11 @@ public class AxolotlClientAnnotationConfigManager {
 		return 10;
 	}
 
-	public static class AnnotationConfigHolder extends ConfigHolder {
+	private static class AnnotationConfigHolder extends ConfigHolder {
 
 		private final OptionCategory config;
-		public AnnotationConfigHolder(OptionCategory config){
+
+		private AnnotationConfigHolder(OptionCategory config){
 			this.config = config;
 		}
 
