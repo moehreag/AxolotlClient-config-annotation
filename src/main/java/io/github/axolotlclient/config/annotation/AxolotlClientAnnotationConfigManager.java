@@ -16,7 +16,7 @@ import java.util.*;
  * The main class for registering a simple, annotation-based config class.
  */
 
-public class AxolotlClientAnnotationConfigManager extends AxolotlClientConfigManager {
+public final class AxolotlClientAnnotationConfigManager extends AxolotlClientConfigManager {
 
 	private static final Set<Object> intializedConfigs = new HashSet<>();
 	private static final Logger LOGGER = LoggerFactory.getLogger(AxolotlClientAnnotationConfigManager.class);
@@ -27,7 +27,7 @@ public class AxolotlClientAnnotationConfigManager extends AxolotlClientConfigMan
      * However, the fields will represent the current values of the options.
 	 * @param config the config class Class
      * @param <C> The config class
-	 * @return the name used to handle config operations with {@link AxolotlClientConfigManager} for this config.
+	 * @return a ConfigInstance for this config.
 	 * Should be your mod's modid for automatic modmenu integration
 	 */
 
