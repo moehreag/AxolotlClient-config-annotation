@@ -1,4 +1,4 @@
-package io.github.axolotlclient.config.annotation.annotations;
+package io.github.axolotlclient.config.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,23 +6,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An optional annotation for declaring additional values for Floats.
+ * An optional annotation for declaring additional values for Integers.
  * If it is not present defaults to 0 as the minimum value and 10 as the maximum value.
  */
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface FloatRange {
+public @interface IntRange {
 
 	/**
-	 * A minimal value for your float. Will be used for the slider and clamping the value.
+	 * A minimal value for your Integer. Will be used for the slider and clamping the value.
 	 * @return the minimal value
 	 */
-	float min() default 0;
+	int min() default 0;
 
 	/**
-	 * A maximal value for your float. Will be used for the slider and clamping the value.
+	 * A maximal value for your Integer. Will be used for the slider and clamping the value.
 	 * @return the maximal value
 	 */
-	float max() default 10;
+	int max() default 10;
 }

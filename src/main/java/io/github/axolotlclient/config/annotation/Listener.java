@@ -1,4 +1,4 @@
-package io.github.axolotlclient.config.annotation.annotations;
+package io.github.axolotlclient.config.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

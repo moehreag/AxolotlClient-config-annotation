@@ -4,7 +4,6 @@ import io.github.axolotlclient.AxolotlclientConfig.AxolotlClientConfigManager;
 import io.github.axolotlclient.AxolotlclientConfig.Color;
 import io.github.axolotlclient.AxolotlclientConfig.ConfigHolder;
 import io.github.axolotlclient.AxolotlclientConfig.options.*;
-import io.github.axolotlclient.config.annotation.annotations.*;
 import org.quiltmc.loader.api.QuiltLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,9 @@ public class AxolotlClientAnnotationConfigManager extends AxolotlClientConfigMan
 	private static final Logger LOGGER = LoggerFactory.getLogger(AxolotlClientAnnotationConfigManager.class);
 
 	/**
-	 * Register a config class with Annotation support
+	 * Register a config class with Annotation support.
+     * Changes in the values of the fields will <b>not</b> be represented in the config screen or the config file.
+     * However, the fields will represent the current values of the options.
 	 * @param config the config class Class
      * @param <C> The config class
 	 * @return the name used to handle config operations with {@link AxolotlClientConfigManager} for this config.
