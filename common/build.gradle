@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'io.github.moehreag'
+archivesBaseName = "axolotlclientconfig-annotationconfig-common"
+//version = "${project.version}+${libs.versions.minecraft.get()}"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+}
+
+dependencies {
+
+}
+
+test {
+
+}

@@ -1,17 +1,26 @@
 [versions]
 # The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
-minecraft = "1.19.3"
+minecraft_v119 = "1.19.3"
+minecraft_v18 = "1.8.9"
 quilt_mappings = "1.19.3+build.2"
 quilt_loader = "0.18.1-beta.25"
+fabric_mappings = "1.8.9+build.451"
+fabric_loader = "0.14.12"
 
-config = "1.0.17+1.19.3"
+config_v119 = "1.0.17+1.19.3"
+config_v18 = "1.0.19+1.8.9"
 
 [libraries]
-minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+minecraft_v119 = { module = "com.mojang:minecraft", version.ref = "minecraft_v119" }
+minecraft_v18 = {module = "com.mojang:minecraft", version.ref = "minecraft_v18" }
 quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
+fabric_mappings = { module = "net.legacyfabric:yarn", version.ref = "fabric_mappings" }
 quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }
+fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
 
-axolotlclient_config = { module = "io.github.axolotlclient:AxolotlClient-config", version.ref = "config" }
+axolotlclient_config_v119 = { module = "io.github.axolotlclient:AxolotlClient-config", version.ref = "config_v119" }
+axolotlclient_config_v18 = { module = "io.github.axolotlclient:AxolotlClient-config", version.ref = "config_v18" }
 
 [plugins]
 quilt_loom = { id = "org.quiltmc.loom", version = "1.0.+" }
+fabric_loom = { id = "fabric-loom", version = "1.0.+" }

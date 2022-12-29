@@ -1,10 +1,11 @@
 plugins {
 	id 'maven-publish'
-	alias libs.plugins.quilt.loom
+	id 'java'
+	//alias libs.plugins.quilt.loom apply false
 }
 
-archivesBaseName = project.archives_base_name
-version = "${project.version}+${libs.versions.minecraft.get()}"
+//archivesBaseName = project.archives_base_name
+version = "${project.version}"
 group = project.maven_group
 
 repositories {
@@ -15,15 +16,9 @@ repositories {
 }
 
 dependencies {
-	minecraft libs.minecraft
-	mappings variantOf(libs.quilt.mappings) { classifier 'intermediary-v2' }
-
-	modImplementation libs.quilt.loader
-
-	modImplementation libs.axolotlclient.config
-	include libs.axolotlclient.config
 }
 
+/*
 processResources {
 	inputs.property 'version', version
 
@@ -33,6 +28,15 @@ processResources {
 	filesMatching('fabric.mod.json') {
 		expand "version": version
 	}
+}
+*/
+
+subprojects {
+	//apply plugin("org.quiltmc.loom")
+	def versionProject = name != "common"
+	/*if(versionProject) {
+		apply plugin: "org.quiltmc.loom"
+	}*/
 }
 
 tasks.withType(JavaCompile).configureEach {

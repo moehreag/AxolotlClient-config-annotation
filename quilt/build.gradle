@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+	id "org.quiltmc.loom" version "1.0.+"
+//	alias libs.plugins.quilt.loom
+}
+
+group 'io.github.moehreag'
+version = "${project.version}+${project.minecraft_119}"
+archivesBaseName = "axolotlclientconfig-annotationconfig-quilt"
+
+repositories {
+	maven {
+		url = "https://moehreag.duckdns.org/maven/releases"
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_119}"
+	mappings "org.quiltmc:quilt-mappings:${project.mappings_119}:intermediary-v2"
+
+	modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader}"
+
+	modImplementation "io.github.axolotlclient:AxolotlClient-config:${project.config_119}"
+	include "io.github.axolotlclient:AxolotlClient-config:${project.config_119}"
+
+	implementation include(project(":common"))
+}
+
+processResources {
+	inputs.property 'version', version
+
+	filesMatching('quilt.mod.json') {
+		expand "version": version
+	}
+}
+
+runClient {
+	classpath(sourceSets.test.runtimeClasspath)
+}
