@@ -19,7 +19,7 @@
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"client_init": "io.github.axolotlclient.config.annotation.ExampleAnnotationConfigInitializer"
+			"client_init": "io.github.axolotlclient.config.annotation.example.ExampleAnnotationConfigInitializer"
 		},
 		"depends": [
 			{

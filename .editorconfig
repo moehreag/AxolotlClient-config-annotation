@@ -11,18 +11,18 @@ trim_trailing_whitespace = true
 indent_style = tab
 
 [*.java]
-indent_style = tab
+indent_style = space
 
 [*.json]
 indent_style = space
 indent_size = 2
 
 [quilt.mod.json]
-indent_style = tab
+indent_style = space
 tab_width = 2
 
 [*.toml]
-indent_style = tab
+indent_style = space
 tab_width = 2
 
 [*.properties]
