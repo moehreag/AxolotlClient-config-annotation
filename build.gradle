@@ -18,7 +18,12 @@ repositories {
 dependencies {
 }
 
+allprojects {
+
+}
+
 subprojects {
+	apply plugin: "maven-publish"
 	java {
 		// Still required by IDEs such as Eclipse and Visual Studio Code
 		/*sourceCompatibility = JavaVersion.VERSION_17
@@ -27,6 +32,14 @@ subprojects {
 		withSourcesJar()
 		withJavadocJar()
 	}
+
+	jar {
+		filesMatching('LICENSE') {
+			rename '^(LICENSE.*?)(\\..*)?$', "\$1_${archivesBaseName}\$2"
+		}
+	}
+
+
 }
 
 tasks.withType(JavaCompile).configureEach {

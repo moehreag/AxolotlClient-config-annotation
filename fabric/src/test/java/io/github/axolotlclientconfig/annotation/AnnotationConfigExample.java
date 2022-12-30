@@ -2,7 +2,10 @@ package io.github.axolotlclientconfig.annotation;
 
 import io.github.axolotlclient.AxolotlclientConfig.Color;
 import io.github.axolotlclient.axolotlclientconfig.annotation.annotations.Config;
+import io.github.axolotlclient.axolotlclientconfig.annotation.annotations.FloatRange;
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.options.KeyBinding;
+import org.lwjgl.input.Keyboard;
 
 @SuppressWarnings("unused")
 public class AnnotationConfigExample implements ClientModInitializer {
@@ -19,5 +22,10 @@ public class AnnotationConfigExample implements ClientModInitializer {
         public double someDouble = 0.25d;
 
         public String exampleString = "1111122223333";
+        public int someInt = 2;
+
+        @FloatRange(min = 13, max = 50)
+        public float someFloat = 24;
+        public KeyBinding exampleKey = new KeyBinding("aaaaaa", Keyboard.KEY_HOME, "category.none");
     }
 }
