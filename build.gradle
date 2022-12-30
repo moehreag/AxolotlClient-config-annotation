@@ -19,24 +19,19 @@ dependencies {
 }
 
 subprojects {
+	java {
+		// Still required by IDEs such as Eclipse and Visual Studio Code
+		/*sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17*/
 
+		withSourcesJar()
+		withJavadocJar()
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = 'UTF-8'
 }
 
-java {
-	// Still required by IDEs such as Eclipse and Visual Studio Code
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
 
-	withSourcesJar()
-	withJavadocJar()
-}
 
-jar {
-	filesMatching('LICENSE') {
-		rename '^(LICENSE.*?)(\\..*)?$', "\$1_${archivesBaseName}\$2"
-	}
-}

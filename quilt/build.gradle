@@ -1,12 +1,14 @@
 plugins {
     id 'java'
 	id "org.quiltmc.loom" version "1.0.+"
-//	alias libs.plugins.quilt.loom
 }
 
 group 'io.github.moehreag'
 version = "${project.version}+${project.minecraft_119}"
 archivesBaseName = "axolotlclientconfig-annotationconfig-quilt"
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	maven {

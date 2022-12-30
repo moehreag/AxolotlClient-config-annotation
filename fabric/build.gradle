@@ -7,8 +7,8 @@ group 'io.github.moehreag'
 version = "${project.version}+${project.minecraft_18}"
 archivesBaseName = "axolotlclientconfig-annotationconfig-fabric"
 
-//sourceCompatibility = JavaVersion.VERSION_1_8
-//targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
 	maven {
