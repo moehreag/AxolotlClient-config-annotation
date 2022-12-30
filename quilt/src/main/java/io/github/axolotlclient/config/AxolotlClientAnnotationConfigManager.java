@@ -7,6 +7,7 @@ import io.github.axolotlclient.AxolotlclientConfig.options.*;
 import io.github.axolotlclient.axolotlclientconfig.annotation.AnnotationConfigException;
 import io.github.axolotlclient.axolotlclientconfig.annotation.ConfigInstance;
 import io.github.axolotlclient.axolotlclientconfig.annotation.annotations.*;
+import net.minecraft.client.option.KeyBind;
 import org.quiltmc.loader.api.QuiltLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,6 @@ public final class AxolotlClientAnnotationConfigManager extends AxolotlClientCon
 	 * @return a io.github.axolotlclient.axolotlclientconfig.annotation.ConfigInstance for this config.
 	 * Should be your mod's modid for automatic modmenu integration
 	 */
-
 	public static <C> ConfigInstance<C> registerConfig(Class<C> config){
 
 		String name;
@@ -116,7 +116,18 @@ public final class AxolotlClientAnnotationConfigManager extends AxolotlClientCon
 				}
 				return new DoubleOption(field.getName(), value -> setField(field, value, clazz, configObject), (Double) val, getSliderDefaultMin(), getSliderDefaultMax());
 			} else if (val instanceof Color) {
-				return new ColorOption(field.getName(), value -> setField(field, value, clazz, configObject), (Color) val);
+                return new ColorOption(field.getName(), value -> setField(field, value, clazz, configObject), (Color) val);
+            } else if (val instanceof KeyBind) {
+                if(!field.isAnnotationPresent(Listener.class)){
+                    LOGGER.info("Keybind without Listener annotation found! It will have no function!");
+                }
+                return new KeyBindOption(field.getName(), (KeyBind) val, keyBind -> {
+                    try {
+                        field.getDeclaringClass().getDeclaredMethod(field.getAnnotation(Listener.class).value(), field.getType()).invoke(clazz, keyBind);
+                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        throw new AnnotationConfigException("KeyBind listener invocation failed! ", e);
+                    }
+                });
 			} else if (val.getClass().isEnum()) {
 				return new EnumOption(field.getName(), value -> {
 					try {

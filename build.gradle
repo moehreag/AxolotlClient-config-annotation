@@ -18,25 +18,8 @@ repositories {
 dependencies {
 }
 
-/*
-processResources {
-	inputs.property 'version', version
-
-	filesMatching('quilt.mod.json') {
-		expand "version": version
-	}
-	filesMatching('fabric.mod.json') {
-		expand "version": version
-	}
-}
-*/
-
 subprojects {
-	//apply plugin("org.quiltmc.loom")
-	def versionProject = name != "common"
-	/*if(versionProject) {
-		apply plugin: "org.quiltmc.loom"
-	}*/
+
 }
 
 tasks.withType(JavaCompile).configureEach {

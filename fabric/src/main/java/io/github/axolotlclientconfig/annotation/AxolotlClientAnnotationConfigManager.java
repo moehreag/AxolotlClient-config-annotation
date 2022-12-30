@@ -8,6 +8,7 @@ import io.github.axolotlclient.axolotlclientconfig.annotation.AnnotationConfigEx
 import io.github.axolotlclient.axolotlclientconfig.annotation.ConfigInstance;
 import io.github.axolotlclient.axolotlclientconfig.annotation.annotations.*;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.options.KeyBinding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -117,7 +118,18 @@ public final class AxolotlClientAnnotationConfigManager extends AxolotlClientCon
 				return new DoubleOption(field.getName(), value -> setField(field, value, clazz, configObject), (Double) val, (double) getSliderDefaultMin(), (double) getSliderDefaultMax());
 			} else if (val instanceof Color) {
 				return new ColorOption(field.getName(), value -> setField(field, value, clazz, configObject), (Color) val);
-			} else if (val.getClass().isEnum()) {
+			}else if (val instanceof KeyBinding) {
+                if(!field.isAnnotationPresent(Listener.class)){
+                    LOGGER.info("Keybind without Listener annotation found! It will have no function!");
+                }
+                return new KeyBindOption(field.getName(), (KeyBinding) val, keyBind -> {
+                    try {
+                        field.getDeclaringClass().getDeclaredMethod(field.getAnnotation(Listener.class).value(), field.getType()).invoke(clazz, keyBind);
+                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        throw new AnnotationConfigException("KeyBind listener invocation failed! ", e);
+                    }
+                });
+            } else if (val.getClass().isEnum()) {
 				return new EnumOption(field.getName(), value -> {
 					try {
 						setField(field,
