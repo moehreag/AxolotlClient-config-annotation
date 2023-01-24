@@ -12,7 +12,7 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
-include 'fabric'
+include '1.8.9'
 include 'common'
-include 'quilt'
+include '1.19.3'
 

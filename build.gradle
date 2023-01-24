@@ -1,7 +1,6 @@
 plugins {
 	id 'maven-publish'
 	id 'java'
-	//alias libs.plugins.quilt.loom apply false
 }
 
 //archivesBaseName = project.archives_base_name
@@ -19,18 +18,27 @@ dependencies {
 }
 
 allprojects {
-
+	repositories {
+		maven {
+			url = "https://moehreag.duckdns.org/maven/releases"
+		}
+	}
 }
 
 subprojects {
 	apply plugin: "maven-publish"
+	apply plugin: 'java'
 	java {
-		// Still required by IDEs such as Eclipse and Visual Studio Code
-		/*sourceCompatibility = JavaVersion.VERSION_17
-		targetCompatibility = JavaVersion.VERSION_17*/
 
 		withSourcesJar()
 		withJavadocJar()
+	}
+
+	repositories {
+		maven {
+			url = "https://moehreag.duckdns.org/maven/releases"
+		}
+		mavenLocal()
 	}
 
 	jar {
