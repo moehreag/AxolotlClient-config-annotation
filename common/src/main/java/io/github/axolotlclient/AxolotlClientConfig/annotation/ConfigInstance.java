@@ -1,4 +1,4 @@
-package io.github.axolotlclient.axolotlclientconfig.annotation;
+package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
 /**
  * A wrapper for a config id + config class instance

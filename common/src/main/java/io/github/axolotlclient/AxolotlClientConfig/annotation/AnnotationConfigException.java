@@ -1,4 +1,4 @@
-package io.github.axolotlclient.axolotlclientconfig.annotation;
+package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
 /**
  * Exception for when creating the config fails.

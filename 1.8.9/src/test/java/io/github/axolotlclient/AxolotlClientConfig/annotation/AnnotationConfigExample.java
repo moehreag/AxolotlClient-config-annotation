@@ -1,9 +1,8 @@
 package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
-import io.github.axolotlclient.AxolotlClientConfig.Color;
-import io.github.axolotlclient.axolotlclientconfig.annotation.ConfigInstance;
-import io.github.axolotlclient.axolotlclientconfig.annotation.annotations.Config;
-import io.github.axolotlclient.axolotlclientconfig.annotation.annotations.FloatRange;
+import io.github.axolotlclient.AxolotlClientConfig.api.util.Color;
+import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.*;
+import io.github.axolotlclient.AxolotlClientConfig.api.util.Colors;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.options.KeyBinding;
 import org.lwjgl.input.Keyboard;
@@ -13,13 +12,13 @@ public class AnnotationConfigExample implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ConfigInstance<ExampleConfigClass> c = AxolotlClientAnnotationConfigManager.getInstance().registerConfig(ExampleConfigClass.class);
+        ConfigInstance<ExampleConfigClass> c = AxolotlClientAnnotationConfig.getInstance().registerConfig(ExampleConfigClass.class);
     }
 
     @Config(name = "axolotlclient-annotationconfig-test")
     public static class ExampleConfigClass {
         public boolean exampleBoolean = true;
-        public Color someColor = Color.SELECTOR_BLUE.withAlpha(255);
+        public Color someColor = Colors.TURQUOISE.withAlpha(255);
         public double someDouble = 0.25d;
 
         public String exampleString = "1111122223333";
@@ -27,7 +26,6 @@ public class AnnotationConfigExample implements ClientModInitializer {
 
         @FloatRange(min = 13, max = 50)
         public float someFloat = 24;
-        public KeyBinding exampleKey = new KeyBinding("aaaaaa", Keyboard.KEY_HOME, "category.none");
 
         public int[][] exampleGraphics = new int[17][17];
     }

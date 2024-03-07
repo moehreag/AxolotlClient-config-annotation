@@ -1,22 +1,63 @@
 plugins {
+	id 'java'
+	id 'maven-publish'
 }
 
 group 'io.github.moehreag'
-archivesBaseName = "axolotlclientconfig-annotationconfig-common"
+base.archivesName = "AxolotlClientConfig-Annotation"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
+	mavenCentral()
+	mavenLocal()
+	maven {
+		url = "https://maven.fabricmc.net"
+	}
+	maven {
+		url = "https://moehreag.duckdns.org/maven/releases"
+	}
+	maven {
+		url = "https://moehreag.duckdns.org/maven/snapshots"
+	}
 }
 
 dependencies {
-	compileOnly("io.github.axolotlclient:AxolotlClient-config:${project.config}+${project.minecraft_18}")
-	compileOnly("io.github.axolotlclient.AxolotlClient-config:AxolotlClientConfig-common:${project.config}")
-
-
+	implementation("net.fabricmc:fabric-loader:0.15.7")
+	implementation("io.github.axolotlclient.AxolotlClient-config:AxolotlClientConfig-common:3.0.0-beta.45")
+	compileOnly("io.github.axolotlclient:AxolotlClient-config:3.0.0-beta.45+1.8.9")
+	implementation("org.apache.logging.log4j:log4j-core:2.23.0")
 }
 
-test {
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = archivesBaseName
+			from components.java
+		}
+	}
 
+	repositories {
+		maven {
+			name = "owlMaven"
+			def repository = project.version.toString().contains("beta") || project.version.toString().contains("alpha") ? "snapshots" : "releases"
+			url = "https://moehreag.duckdns.org/maven/"+repository
+			credentials(PasswordCredentials)
+			authentication {
+				basic(BasicAuthentication)
+			}
+		}
+	}
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+jar {
+	filesMatching('LICENSE') {
+		rename '^(LICENSE.*?)(\\..*)?$', "\$1_${archivesBaseName}\$2"
+	}
 }

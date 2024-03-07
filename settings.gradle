@@ -1,6 +1,10 @@
 pluginManagement {
 	repositories {
 		maven {
+			name = "Ornithe"
+			url = "https://maven.ornithemc.net/releases"
+		}
+		maven {
 			name = 'Quilt'
 			url = 'https://maven.quiltmc.org/repository/release'
 		}
@@ -14,5 +18,4 @@ pluginManagement {
 }
 include '1.8.9'
 include 'common'
-include '1.19.3'
 

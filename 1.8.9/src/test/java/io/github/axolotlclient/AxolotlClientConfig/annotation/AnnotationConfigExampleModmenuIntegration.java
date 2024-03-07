@@ -1,19 +1,19 @@
 package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
-import io.github.prospector.modmenu.api.ModMenuApi;
-import net.minecraft.client.gui.screen.Screen;
-
-import java.util.function.Function;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
+import io.github.axolotlclient.AxolotlClientConfig.api.AxolotlClientConfig;
+import io.github.axolotlclient.AxolotlClientConfig.api.manager.ConfigManager;
+import io.github.axolotlclient.AxolotlClientConfig.api.ui.ConfigUI;
 
 public class AnnotationConfigExampleModmenuIntegration implements ModMenuApi {
 
     @Override
-    public String getModId() {
-        return "axolotlclient-annotationconfig-test";
-    }
-
-    @Override
-    public Function<Screen, ? extends Screen> getConfigScreenFactory() {
-        return screen -> AxolotlClientAnnotationConfigManager.getInstance().getConfigScreen("axolotlclient-annotationconfig-test", screen);
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        return parent -> {
+            ConfigManager manager = AxolotlClientConfig.getInstance().getConfigManager("axolotlclient-annotationconfig-test");
+            return ConfigUI.getInstance().getScreen(this.getClass().getClassLoader(),
+                    manager.getRoot(), parent);
+        };
     }
 }

@@ -1,58 +1,24 @@
 plugins {
-	id 'maven-publish'
-	id 'java'
 }
 
-//archivesBaseName = project.archives_base_name
-version = "${project.version}"
-group = project.maven_group
-
 repositories {
+	mavenCentral()
 	mavenLocal()
 	maven {
+		url = "https://maven.fabricmc.net"
+	}
+	maven {
 		url = "https://moehreag.duckdns.org/maven/releases"
+	}
+	maven {
+		url = "https://moehreag.duckdns.org/maven/snapshots"
 	}
 }
 
 dependencies {
-}
-
-allprojects {
-	repositories {
-		maven {
-			url = "https://moehreag.duckdns.org/maven/releases"
-		}
-	}
-}
-
-subprojects {
-	apply plugin: "maven-publish"
-	apply plugin: 'java'
-	java {
-
-		withSourcesJar()
-		withJavadocJar()
-	}
-
-	repositories {
-		maven {
-			url = "https://moehreag.duckdns.org/maven/releases"
-		}
-		mavenLocal()
-	}
-
-	jar {
-		filesMatching('LICENSE') {
-			rename '^(LICENSE.*?)(\\..*)?$', "\$1_${archivesBaseName}\$2"
-		}
-	}
-
 
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = 'UTF-8'
-}
 
 
 
