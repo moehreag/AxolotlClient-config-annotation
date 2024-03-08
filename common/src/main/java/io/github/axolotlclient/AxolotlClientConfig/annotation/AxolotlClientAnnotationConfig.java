@@ -7,6 +7,7 @@ import java.util.Set;
 
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.*;
 import io.github.axolotlclient.AxolotlClientConfig.api.AxolotlClientConfig;
+import io.github.axolotlclient.AxolotlClientConfig.api.manager.ConfigManager;
 import io.github.axolotlclient.AxolotlClientConfig.api.options.Option;
 import io.github.axolotlclient.AxolotlClientConfig.api.options.OptionCategory;
 import io.github.axolotlclient.AxolotlClientConfig.api.util.Color;
@@ -70,10 +71,14 @@ public class AxolotlClientAnnotationConfig {
         }
 
         OptionCategory category = generateCategory(name, config, conf, conf);
-        AxolotlClientConfig.getInstance().register(new JsonConfigManager(FabricLoader.getInstance().getConfigDir().resolve(category.getName() + ".json"),
-                category));
+        ConfigManager manager = new JsonConfigManager(FabricLoader.getInstance().getConfigDir().resolve(category.getName() + ".json"), category);
+        AxolotlClientConfig.getInstance().register(manager);
+        manager.load();
+        manager.save();
 
         INTIALIZED_CONFIGS.add(conf);
+
+        updateFields(category, conf, config);
 
         return new ConfigInstance<>(name, conf);
     }
@@ -84,7 +89,7 @@ public class AxolotlClientAnnotationConfig {
         for (Field f : clazz.getDeclaredFields()) {
             try {
                 if (f.getType().getEnclosingClass() != null && f.getType().getEnclosingClass().equals(declaringClass.getClass()) && !f.getType().isEnum()){
-                    category.add(generateCategory(f.getName(), f.getType(), conf, f.get(declaringClass)));
+                    category.add(generateCategory(getFieldName(f), f.getType(), conf, f.get(declaringClass)));
                 } else if (f.getDeclaringClass().equals(clazz)) {
                     Option<?> o = getOption(f, declaringClass, conf);
                     if (o != null) {
@@ -109,33 +114,31 @@ public class AxolotlClientAnnotationConfig {
             Object val = field.get(clazz);
 
             if (val instanceof Boolean) {
-                return new BooleanOption(field.getName(), (Boolean) val, value -> setField(field, value, clazz, configObject));
+                return new BooleanOption(getFieldName(field), (Boolean) val, value -> setField(field, value, configObject));
             } else if (val instanceof String) {
-                return new StringOption(field.getName(), (String) val, value -> setField(field, value, clazz, configObject));
+                return new StringOption(getFieldName(field), (String) val, value -> setField(field, value, configObject));
             } else if (val instanceof Integer) {
                 if(field.isAnnotationPresent(IntRange.class)){
-                    return new IntegerOption(field.getName(), (Integer) val, value -> setField(field, value, clazz, configObject), field.getAnnotation(IntRange.class).min(), field.getAnnotation(IntRange.class).max());
+                    return new IntegerOption(getFieldName(field), (Integer) val, value -> setField(field, value, configObject), field.getAnnotation(IntRange.class).min(), field.getAnnotation(IntRange.class).max());
                 }
-                return new IntegerOption(field.getName(), (Integer) val, value -> setField(field, value, clazz, configObject), getSliderDefaultMin(), getSliderDefaultMax());
+                return new IntegerOption(getFieldName(field), (Integer) val, value -> setField(field, value, configObject), getSliderDefaultMin(), getSliderDefaultMax());
             } else if (val instanceof Float) {
                 if(field.isAnnotationPresent(FloatRange.class)){
-                    return new FloatOption(field.getName(), (Float) val, value -> setField(field, value, clazz, configObject), field.getAnnotation(FloatRange.class).min(), field.getAnnotation(FloatRange.class).max());
+                    return new FloatOption(getFieldName(field), (Float) val, value -> setField(field, value, configObject), field.getAnnotation(FloatRange.class).min(), field.getAnnotation(FloatRange.class).max());
                 }
-                return new FloatOption(field.getName(), (Float) val, value -> setField(field, value, clazz, configObject), (float) getSliderDefaultMin(), (float) getSliderDefaultMax());
+                return new FloatOption(getFieldName(field), (Float) val, value -> setField(field, value, configObject), (float) getSliderDefaultMin(), (float) getSliderDefaultMax());
             } else if (val instanceof Double) {
                 if (field.isAnnotationPresent(DoubleRange.class)) {
-                    return new DoubleOption(field.getName(), (Double) val, value -> setField(field, value, clazz, configObject), field.getAnnotation(DoubleRange.class).min(), field.getAnnotation(DoubleRange.class).max());
+                    return new DoubleOption(getFieldName(field), (Double) val, value -> setField(field, value, configObject), field.getAnnotation(DoubleRange.class).min(), field.getAnnotation(DoubleRange.class).max());
                 }
-                return new DoubleOption(field.getName(), (Double) val, value -> setField(field, value, clazz, configObject), (double) getSliderDefaultMin(), (double) getSliderDefaultMax());
+                return new DoubleOption(getFieldName(field), (Double) val, value -> setField(field, value, configObject), (double) getSliderDefaultMin(), (double) getSliderDefaultMax());
             } else if (val instanceof Color) {
-                return new ColorOption(field.getName(), (Color) val, value -> setField(field, value, clazz, configObject));
+                return new ColorOption(getFieldName(field), (Color) val, value -> setField(field, value, configObject));
             } else if (val.getClass().isEnum()) {
                 //noinspection unchecked
-                return getEnumOption(field.getName(), (Class<Object>) val.getClass(), val, value -> setField(field, value, clazz, configObject));
-            } else if (val instanceof int[][]){
-                return new GraphicsOption(field.getName(), (int[][]) val, value -> setField(field, value, clazz, configObject));
+                return getEnumOption(getFieldName(field), (Class<Object>) val.getClass(), val, value -> setField(field, value, configObject));
             } else if (val instanceof Graphics){
-                return new GraphicsOption(field.getName(), (Graphics) val, value -> setField(field, value, clazz, configObject));
+                return new GraphicsOption(getFieldName(field), (Graphics) val, value -> setField(field, value, configObject));
             }
             return null;
         } catch (Exception e){
@@ -148,23 +151,56 @@ public class AxolotlClientAnnotationConfig {
         return new EnumOption<>(name, clazz, defaultValue, changeListener);
     }
 
-    private <T> void setField(Field field, T value, Object declaringClass, Object configObject) {
+    private void updateFields(OptionCategory category, Object config, Class<?> configClass){
+        category.getOptions().forEach(option -> {
+			try {
+                Field f = configClass.getDeclaredField(option.getName());
+                Object value = option.get();
+                setField(f, value, config);
+			} catch (NoSuchFieldException e) {
+				error("Failed to update "+option.getName()+": "+e);
+			}
+		});
+        category.getSubCategories().forEach(c -> {
+            Class<?>[] cls = configClass.getDeclaredClasses();
+            for (Class<?> cl : cls){
+                if (cl.getSimpleName().equals(c.getName())) {
+                    updateFields(c, config, cl);
+                }
+            }
+		});
+    }
+
+    private String getFieldName(Field field){
+        if(field.isAnnotationPresent(SerializedName.class)){
+            String value = field.getAnnotation(SerializedName.class).value();
+            if (!value.trim().isEmpty()){
+                return value;
+            }
+        }
+        return field.getName();
+    }
+
+    private <T> void setField(Field field, T value, Object configObject) {
         if (isRegistered(configObject)) {
             try {
-                field.set(declaringClass, value);
+                field.setAccessible(true);
+                field.set(configObject, value);
                 if (field.isAnnotationPresent(Listener.class)) {
                     try {
-                        field.getDeclaringClass().getDeclaredMethod(field.getAnnotation(Listener.class).value(), field.getType()).invoke(declaringClass, value);
+                        field.getDeclaringClass().getDeclaredMethod(field.getAnnotation(Listener.class).value(), field.getType()).invoke(configObject, value);
                     } catch (ReflectiveOperationException e){
                         error("Listener Method '"+field.getAnnotation(Listener.class).value()+"' could not be found or has the wrong parameters!");
                     }
                 }
-                if(!field.get(declaringClass).equals(value)){
+                if(!field.get(configObject).equals(value)){
                     error("Field "+field.getName()+" could not be set to its new value!");
                 }
             } catch (IllegalAccessException e) {
                 error("Field "+field.getName()+" could not be set to its new value!");
             }
+        } else {
+            error("Not setting field because the config object "+configObject+" is not known!");
         }
     }
 

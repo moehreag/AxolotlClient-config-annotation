@@ -1,9 +1,14 @@
 package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
+import java.util.Arrays;
+
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.Config;
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.FloatRange;
+import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.SerializedName;
 import io.github.axolotlclient.AxolotlClientConfig.api.util.Color;
 import io.github.axolotlclient.AxolotlClientConfig.api.util.Colors;
+import io.github.axolotlclient.AxolotlClientConfig.api.util.Graphics;
+import io.github.axolotlclient.AxolotlClientConfig.impl.util.GraphicsImpl;
 import net.fabricmc.api.ClientModInitializer;
 
 @SuppressWarnings("unused")
@@ -12,9 +17,13 @@ public class AnnotationConfigExample implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ConfigInstance<ExampleConfigClass> c = AxolotlClientAnnotationConfig.getInstance().registerConfig(ExampleConfigClass.class);
+        System.out.println("Fields after registering config: ");
+        System.out.println(c.getConfig());
+
     }
 
     @Config(name = "axolotlclient-annotationconfig-test")
+
     public static class ExampleConfigClass {
         public boolean exampleBoolean = true;
         public Color someColor = Colors.TURQUOISE.withAlpha(255);
@@ -26,6 +35,19 @@ public class AnnotationConfigExample implements ClientModInitializer {
         @FloatRange(min = 13, max = 50)
         public float someFloat = 24;
 
-        public int[][] exampleGraphics = new int[17][17];
+        @SerializedName("some_graphics")
+        public Graphics exampleGraphics = new GraphicsImpl(new int[17][17]);
+
+        @Override
+        public String toString() {
+			return "ExampleConfigClass{" + "exampleBoolean=" + exampleBoolean +
+				   ", someColor=" + someColor +
+				   ", someDouble=" + someDouble +
+				   ", exampleString='" + exampleString + '\'' +
+				   ", someInt=" + someInt +
+				   ", someFloat=" + someFloat +
+				   ", exampleGraphics=" + Arrays.toString(exampleGraphics.getPixelData()) +
+				   '}';
+        }
     }
 }
