@@ -56,6 +56,14 @@ java {
 	withJavadocJar()
 }
 
+processResources {
+	inputs.property 'version', version
+
+	filesMatching('fabric.mod.json') {
+		expand "version": version
+	}
+}
+
 jar {
 	filesMatching('LICENSE') {
 		rename '^(LICENSE.*?)(\\..*)?$', "\$1_${archivesBaseName}\$2"

@@ -75,9 +75,6 @@ public class AxolotlClientAnnotationConfig {
 
         INTIALIZED_CONFIGS.add(conf);
 
-        info("Registered Annotation-based config: "+name);
-        info("can get: "+AxolotlClientConfig.getInstance().getConfigManager(name));
-
         return new ConfigInstance<>(name, conf);
     }
 

@@ -18,6 +18,6 @@
   },
   "depends": {
     "axolotlclientconfig": "*",
-    "fabric-loader": "*"
+    "fabricloader": "*"
   }
 }

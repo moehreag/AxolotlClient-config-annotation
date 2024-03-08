@@ -1,11 +1,10 @@
 package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
+import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.Config;
+import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.FloatRange;
 import io.github.axolotlclient.AxolotlClientConfig.api.util.Color;
-import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.*;
 import io.github.axolotlclient.AxolotlClientConfig.api.util.Colors;
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.client.options.KeyBinding;
-import org.lwjgl.input.Keyboard;
 
 @SuppressWarnings("unused")
 public class AnnotationConfigExample implements ClientModInitializer {
