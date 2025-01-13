@@ -1,5 +1,13 @@
 plugins {
+	id 'java'
+	id 'maven-publish'
 }
+
+group 'io.github.moehreag'
+base.archivesName = "AxolotlClientConfig-Annotation"
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
@@ -16,9 +24,48 @@ repositories {
 }
 
 dependencies {
-
+	implementation("net.fabricmc:fabric-loader:0.15.7")
+	implementation("io.github.axolotlclient.AxolotlClient-config:AxolotlClientConfig-common:${project.config}")
+	compileOnly("io.github.axolotlclient:AxolotlClient-config:${project.config}+1.8.9")
+	implementation("org.apache.logging.log4j:log4j-core:2.23.0")
 }
 
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = archivesBaseName
+			from components.java
+		}
+	}
 
+	repositories {
+		maven {
+			name = "owlMaven"
+			def repository = project.version.toString().contains("beta") || project.version.toString().contains("alpha") ? "snapshots" : "releases"
+			url = "https://moehreag.duckdns.org/maven/"+repository
+			credentials(PasswordCredentials)
+			authentication {
+				basic(BasicAuthentication)
+			}
+		}
+	}
+}
 
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
 
+processResources {
+	inputs.property 'version', version
+
+	filesMatching('fabric.mod.json') {
+		expand "version": version
+	}
+}
+
+jar {
+	filesMatching('LICENSE') {
+		rename '^(LICENSE.*?)(\\..*)?$', "\$1_${archivesBaseName}\$2"
+	}
+}

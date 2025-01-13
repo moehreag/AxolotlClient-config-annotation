@@ -17,5 +17,4 @@ pluginManagement {
 	}
 }
 include '1.8.9'
-include 'common'
 

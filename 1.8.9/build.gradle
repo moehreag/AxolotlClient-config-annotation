@@ -1,15 +1,15 @@
 plugins {
     id 'java'
-	id "fabric-loom" version "1.5.+"
-	id "ploceus" version "1.5.+"
+	id "fabric-loom" version "1.9.+"
+	id "ploceus" version "1.9.+"
 }
 
 group = maven_group
 version = "${project.version}+${project.minecraft_18}"
-archivesBaseName = "axolotlclientconfig-annotationconfig-test"
+base.archivesName = "axolotlclientconfig-annotationconfig-test"
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	maven {
@@ -28,10 +28,30 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader}"
 
 	implementation("io.github.axolotlclient.AxolotlClient-config:AxolotlClientConfig-common:${project.config}")
-	modImplementation("io.github.axolotlclient:AxolotlClient-config:3.0.0-beta.45+1.8.9")
+	modImplementation("io.github.axolotlclient:AxolotlClient-config:${project.config}+1.8.9")
 	modImplementation("com.terraformersmc:modmenu:0.1.1+mc1.8.9")
 
-	implementation (project(":common"))
+	def lwjglVersion = "3.3.5"
+	api("org.lwjgl:lwjgl-nanovg:$lwjglVersion")
+	runtimeOnly("org.lwjgl:lwjgl-nanovg:${lwjglVersion}:natives-linux")
+	runtimeOnly("org.lwjgl:lwjgl-nanovg:${lwjglVersion}:natives-linux-arm64")
+	runtimeOnly("org.lwjgl:lwjgl-nanovg:${lwjglVersion}:natives-windows")
+	runtimeOnly("org.lwjgl:lwjgl-nanovg:${lwjglVersion}:natives-windows-arm64")
+	runtimeOnly("org.lwjgl:lwjgl-nanovg:${lwjglVersion}:natives-macos")
+	runtimeOnly("org.lwjgl:lwjgl-nanovg:${lwjglVersion}:natives-macos-arm64")
+
+	include("org.apache.logging.log4j:log4j-slf4j-impl:2.0-beta9") {
+		exclude group: "org.apache.logging.log4j", module: "log4j-api"
+		exclude group: "org.apache.logging.log4j", module: "log4j-core"
+	}
+	implementation(include("org.slf4j:slf4j-api:1.7.36"))
+	localRuntime("org.slf4j:slf4j-jdk14:1.7.36")
+
+	def legacy_lwjgl = "1.2.1+1.8.9"
+	modCompileOnly("io.github.moehreag:legacy-lwjgl3:${legacy_lwjgl}")
+	modLocalRuntime("io.github.moehreag:legacy-lwjgl3:${legacy_lwjgl}:all-remapped")
+
+	implementation (project(":"))
 }
 
 processResources {

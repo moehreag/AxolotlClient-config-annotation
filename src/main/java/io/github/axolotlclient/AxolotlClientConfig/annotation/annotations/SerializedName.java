@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.github.axolotlclient.AxolotlClientConfig.annotation.NamingScheme;
+
 /**
  * Specifies an alternative name for a field/subclass to be saved as
  */
@@ -16,4 +18,10 @@ public @interface SerializedName {
      * @return the name of this entry
      */
     String value();
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE})
+    @interface RenameAll {
+        NamingScheme value() default NamingScheme.NONE;
+    }
 }
