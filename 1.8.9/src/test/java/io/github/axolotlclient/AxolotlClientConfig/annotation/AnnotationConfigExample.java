@@ -1,7 +1,5 @@
 package io.github.axolotlclient.AxolotlClientConfig.annotation;
 
-import java.util.Arrays;
-
 import com.google.gson.JsonObject;
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.Config;
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.FloatRange;
@@ -23,12 +21,12 @@ public class AnnotationConfigExample implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ConfigInstance<ExampleConfigClass> c = AxolotlClientAnnotationConfig.getInstance().registerConfig(ExampleConfigClass.class, ExampleConfigManager::new);
-        System.out.println("Fields after registering config: ");
-        System.out.println(c.config());
-
         if (AxolotlClientConfig.getInstance().getConfigManager(c.id()) instanceof ExampleConfigManager m) {
             System.out.println(m.getSerializedJson());
         }
+
+        // Access the config fields through the object provided by the ConfigInstance
+        System.out.println(c.config().exampleBoolean);
     }
 
     // Only used to print out the serialized values, usually not necessary in actual use
@@ -64,16 +62,22 @@ public class AnnotationConfigExample implements ClientModInitializer {
         @Listener("onBooleanTwoChange")
         public boolean booleanTwo = false;
 
-        @Override
-        public String toString() {
-			return "ExampleConfigClass{" + "exampleBoolean=" + exampleBoolean +
-				   ", someColor=" + someColor +
-				   ", someDouble=" + someDouble +
-				   ", exampleString='" + exampleString + '\'' +
-				   ", someInt=" + someInt +
-				   ", someFloat=" + someFloat +
-				   ", exampleGraphics=" + Arrays.toString(exampleGraphics.getPixelData()) +
-				   '}';
+        public SubCategory c2 = new SubCategory();
+        public SubCategory c3 = new SubCategory();
+        public SubCategory c4 = new SubCategory();
+        public SubCategory c5 = new SubCategory();
+        @SuppressWarnings("NonAsciiCharacters")
+        public SubCategory VeryBADLY_namedüFIELD = new SubCategory();
+        public SubCategory c7 = new SubCategory();
+        public SubCategory c8 = new SubCategory();
+        public SubCategory c9 = new SubCategory();
+        public SubCategory SCREAMING_SNAKE_CASE_NAMED_FIELD = new SubCategory();
+        public SubCategory PascalCaseNamedField = new SubCategory();
+
+        @SerializedName.RenameAll(NamingScheme.KEBAB_CASE)
+        public static class SubCategory {
+            public boolean subBoolean = true;
+            public Color veryLengthyColorOption______________ = Colors.DARK_YELLOW;
         }
 
         void onBooleanTwoChange(boolean value) {

@@ -19,9 +19,17 @@ public @interface SerializedName {
      */
     String value();
 
+    /**
+     * Specify a NamingScheme to rename fields to
+     */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.TYPE})
     @interface RenameAll {
+        /**
+         * The scheme to rename fields to.
+         * @return a NamingScheme
+         * @see NamingScheme
+         */
         NamingScheme value() default NamingScheme.NONE;
     }
 }

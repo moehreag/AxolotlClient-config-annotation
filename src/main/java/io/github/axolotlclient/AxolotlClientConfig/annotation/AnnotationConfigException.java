@@ -3,24 +3,10 @@ package io.github.axolotlclient.AxolotlClientConfig.annotation;
 /**
  * Exception for when creating the config fails.
  */
-public class AnnotationConfigException extends IllegalStateException {
+class AnnotationConfigException extends IllegalStateException {
     /**
-     * @param s String explaining the reason
-     */
-    public AnnotationConfigException(String s) {
-        super(s);
-    }
-
-    /**
-     * Create an exception
-     */
-    public AnnotationConfigException() {
-        super();
-    }
-
-    /**
-     * @param message Message explaining the need
-     * @param cause a throwable to throw
+     * @param message String explaining the reason
+     * @param cause a throwable that might get thrown out of the window
      */
     public AnnotationConfigException(String message, Throwable cause) {
         super(message, cause);
@@ -29,7 +15,7 @@ public class AnnotationConfigException extends IllegalStateException {
     /**
      * @param cause a throwable that might get thrown out of the window
      */
-    public AnnotationConfigException(Throwable cause) {
+    AnnotationConfigException(Throwable cause) {
         super(cause);
     }
 }

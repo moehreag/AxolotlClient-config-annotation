@@ -22,12 +22,17 @@ import org.apache.logging.log4j.Logger;
 /**
  * The Annotation Config Entrypoint
  */
+@SuppressWarnings("unused")
 public class AxolotlClientAnnotationConfig {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Set<Object> INTIALIZED_CONFIGS = new HashSet<>();
 
     private static final AxolotlClientAnnotationConfig INSTANCE = new AxolotlClientAnnotationConfig();
+
+    private AxolotlClientAnnotationConfig() {
+
+    }
 
     /**
      * Get an instance of this class to register your config.
@@ -45,14 +50,26 @@ public class AxolotlClientAnnotationConfig {
      *
      * @param config the config class Class
      * @param <C>    The config class
-     * @return a io.github.axolotlclient.axolotlclientconfig.annotation.ConfigInstance for this config.
+     * @return a ConfigInstance for this config.
      * Should be your mod's modid for automatic modmenu integration
      */
-
     public <C> ConfigInstance<C> registerConfig(Class<C> config) {
         return registerConfig(config, category -> new JsonConfigManager(FabricLoader.getInstance().getConfigDir().resolve(category.getName() + ".json"), category));
     }
 
+    /**
+     * Register a config class with Annotation support.
+     * Changes in the values of the fields will <b>not</b> be represented in the config screen or the config file.
+     * However, the fields will represent the current values of the options.
+     * <br>
+     * The name of your config class should be your mod's modid for automatic modmenu integration.
+     * Otherwise, a different name may be used with the @Config annotation as well as @SerializedName.RenameAll(NamingScheme)
+     *
+     * @param config          the config class Class
+     * @param <C>             The config class
+     * @param managerFunction A function to create a config manager for this config, if desired
+     * @return a ConfigInstance for this config.
+     */
     public <C> ConfigInstance<C> registerConfig(Class<C> config, Function<OptionCategory, ConfigManager> managerFunction) {
         String name;
         if (config.isAnnotationPresent(Config.class)) {
@@ -62,10 +79,31 @@ public class AxolotlClientAnnotationConfig {
         return registerConfig(config, name, managerFunction);
     }
 
+    /**
+     * Register a config class with Annotation support.
+     * Changes in the values of the fields will <b>not</b> be represented in the config screen or the config file.
+     * However, the fields will represent the current values of the options.
+     *
+     * @param config the config class Class
+     * @param <C>    The config class
+     * @param name   The name of this config
+     * @return a ConfigInstance for this config.
+     */
     public <C> ConfigInstance<C> registerConfig(Class<C> config, String name) {
         return registerConfig(config, name, category -> new JsonConfigManager(FabricLoader.getInstance().getConfigDir().resolve(category.getName() + ".json"), category));
     }
 
+    /**
+     * Register a config class with Annotation support.
+     * Changes in the values of the fields will <b>not</b> be represented in the config screen or the config file.
+     * However, the fields will represent the current values of the options.
+     *
+     * @param config          the config class Class
+     * @param <C>             The config class
+     * @param name            The name of this config
+     * @param managerFunction A function to create a config manager for this config, if desired
+     * @return a ConfigInstance for this config.
+     */
     public <C> ConfigInstance<C> registerConfig(Class<C> config, String name, Function<OptionCategory, ConfigManager> managerFunction) {
         C conf;
 
@@ -74,7 +112,7 @@ public class AxolotlClientAnnotationConfig {
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
                  IllegalAccessException e) {
             error("Couldn't create new Instance of config class for mod " + name + "!");
-            throw new AnnotationConfigException("Config class must be public and have a no-args constructor!");
+            throw new AnnotationConfigException("Config class must be public and have a no-args constructor!", e);
         }
 
         if (!FabricLoader.getInstance().isModLoaded(name) && FabricLoader.getInstance().isDevelopmentEnvironment()) {
@@ -82,7 +120,7 @@ public class AxolotlClientAnnotationConfig {
                     "This message will not be shown in a production environment.");
         }
 
-        OptionCategory category = generateCategory(name, config, conf, conf);
+        OptionCategory category = generateCategory(name, config, conf);
         ConfigManager manager = managerFunction.apply(category);
         AxolotlClientConfig.getInstance().register(manager);
         manager.load();
@@ -95,19 +133,20 @@ public class AxolotlClientAnnotationConfig {
         return new ConfigInstance<>(name, conf);
     }
 
-    private OptionCategory generateCategory(String name, Class<?> clazz, Object conf, Object declaringClass) {
-        NamingScheme scheme;
-        if (clazz.isAnnotationPresent(SerializedName.RenameAll.class)) {
-            scheme = clazz.getAnnotation(SerializedName.RenameAll.class).value();
-        } else scheme = NamingScheme.NONE;
+    private NamingScheme getNamingScheme(Class<?> c) {
+        return c.isAnnotationPresent(SerializedName.RenameAll.class) ? c.getAnnotation(SerializedName.RenameAll.class).value() : NamingScheme.NONE;
+    }
+
+    private OptionCategory generateCategory(String name, Class<?> clazz, Object declaringClass) {
+        NamingScheme scheme = getNamingScheme(clazz);
         OptionCategory category = OptionCategory.create(name);
 
         for (Field f : clazz.getDeclaredFields()) {
             try {
                 if (f.getType().getEnclosingClass() != null && f.getType().getEnclosingClass().equals(declaringClass.getClass()) && !f.getType().isEnum()) {
-                    category.add(generateCategory(getFieldName(f, scheme), f.getType(), conf, f.get(declaringClass)));
+                    category.add(generateCategory(getFieldName(f, scheme), f.getType(), f.get(declaringClass)));
                 } else if (f.getDeclaringClass().equals(clazz)) {
-                    Option<?> o = getOption(f, declaringClass, conf, scheme);
+                    Option<?> o = getOption(f, declaringClass, scheme);
                     if (o != null) {
                         category.add(o);
                     } else {
@@ -124,10 +163,10 @@ public class AxolotlClientAnnotationConfig {
         return category;
     }
 
-    private Option<?> getOption(Field field, Object clazz, Object configObject, NamingScheme scheme) {
+    private Option<?> getOption(Field field, Object configObject, NamingScheme scheme) {
         try {
             field.setAccessible(true);
-            Object val = field.get(clazz);
+            Object val = field.get(configObject);
 
             if (val instanceof Boolean) {
                 return new BooleanOption(getFieldName(field, scheme), (Boolean) val, value -> setField(field, value, configObject));
@@ -157,7 +196,7 @@ public class AxolotlClientAnnotationConfig {
             }
             return null;
         } catch (Exception e) {
-            warn("Unsupported field in config class " + clazz.getClass().getName() + ": " + field.getName());
+            warn("Unsupported field in config class " + configObject.getClass().getName() + ": " + field.getName());
         }
         return null;
     }
@@ -168,10 +207,7 @@ public class AxolotlClientAnnotationConfig {
     }
 
     private void updateFields(OptionCategory category, Object config, Class<?> configClass) {
-        NamingScheme scheme;
-        if (configClass.isAnnotationPresent(SerializedName.RenameAll.class)) {
-            scheme = configClass.getAnnotation(SerializedName.RenameAll.class).value();
-        } else scheme = NamingScheme.NONE;
+        NamingScheme scheme = getNamingScheme(configClass);
         category.getOptions().forEach(option -> {
             try {
                 Field f = findField(option.getName(), configClass, scheme);
@@ -182,11 +218,12 @@ public class AxolotlClientAnnotationConfig {
             }
         });
         category.getSubCategories().forEach(c -> {
-            Class<?>[] cls = configClass.getDeclaredClasses();
-            for (Class<?> cl : cls) {
-                if (cl.getSimpleName().equals(c.getName())) {
-                    updateFields(c, config, cl);
-                }
+            try {
+                Field sub = findField(c.getName(), configClass, scheme);
+                Class<?> cl = sub.getType();
+                updateFields(c, sub.get(config), cl);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                error("Failed to update " + c.getName() + ": " + e);
             }
         });
     }
@@ -218,7 +255,9 @@ public class AxolotlClientAnnotationConfig {
                 if (field.isAnnotationPresent(Listener.class)) {
                     Listener annotation = field.getAnnotation(Listener.class);
                     try {
-                        field.getDeclaringClass().getDeclaredMethod(annotation.value(), field.getType()).invoke(configObject, value);
+                        var method = field.getDeclaringClass().getDeclaredMethod(annotation.value(), field.getType());
+                        method.setAccessible(true);
+                        method.invoke(configObject, value);
                     } catch (ReflectiveOperationException e) {
                         error("Listener Method '" + field.getAnnotation(Listener.class).value() + "' could not be found or has the wrong parameters!");
                     }
@@ -235,7 +274,7 @@ public class AxolotlClientAnnotationConfig {
     }
 
     boolean isRegistered(Object o) {
-        return INTIALIZED_CONFIGS.contains(o);
+        return INTIALIZED_CONFIGS.contains(o) || INTIALIZED_CONFIGS.stream().anyMatch(c -> o.getClass().getEnclosingClass() != null && o.getClass().getEnclosingClass() == c.getClass());
     }
 
     private int getSliderDefaultMin() {

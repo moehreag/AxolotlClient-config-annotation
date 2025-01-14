@@ -14,11 +14,11 @@ import java.lang.annotation.Target;
 public @interface Listener {
 
 	/**
-	 *
+	 * Define a listener method for an option. This method will be invoked reflectively.
 	 * @return A method name in the same class as this field, it will be called when the option related to this field changes.
 	 *  The method has to have the structure of
 	 *  {@code
-	 *      void method(<type of your field> newValue){
+	 *      <any access modified> void method(<type of your field> newValue){
 	 *          ...
 	 *      }
 	 *  }
