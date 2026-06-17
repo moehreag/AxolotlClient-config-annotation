@@ -10,10 +10,10 @@ base.archivesName = "axolotlclientconfig-annotationconfig-test"
 
 repositories {
 	maven {
-		url = "https://moehreag.duckdns.org/maven/releases"
+		url = "https://maven.axolotlclient.com/releases"
 	}
 	maven {
-		url = "https://moehreag.duckdns.org/maven/snapshots"
+		url = "https://maven.axolotlclient.com/snapshots"
 	}
 	mavenCentral()
 }
