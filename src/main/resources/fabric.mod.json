@@ -19,5 +19,15 @@
   "depends": {
     "axolotlclientconfig": "*",
     "fabricloader": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "parent": {
+        "id": "axolotlclient",
+        "name": "AxolotlClient",
+        "icon": "assets/axolotlclientconfig/icon.png"
+      },
+      "badges": ["library"]
+    }
   }
 }

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "axolotlclient-annotationconfig",
+  "id": "axolotlclient-annotationconfig-example",
   "version": "${version}",
-  "name": "AxolotlClient-config Annotation addon",
-  "description": "Addon for AxolotlClient-config for simple annotation-based configs.",
+  "name": "AxolotlClient-config Annotation addon example config",
+  "description": "Addon for AxolotlClient-config for simple annotation-based configs, example config.",
   "authors": [
     "moehreag"
   ],
@@ -15,6 +15,9 @@
   "icon": "assets/axolotlclient-annotationconfig/icon.png",
   "environment": "client",
   "entrypoints": {
+    "client": [
+      "com.example.annotation.AnnotationConfigExample"
+      ]
   },
   "depends": {
     "axolotlclientconfig": "*"

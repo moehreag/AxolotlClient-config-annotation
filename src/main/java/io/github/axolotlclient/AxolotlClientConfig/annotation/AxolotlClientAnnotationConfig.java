@@ -212,7 +212,7 @@ public class AxolotlClientAnnotationConfig {
             try {
                 Field f = findField(option.getName(), configClass, scheme);
                 Object value = option.get();
-                setField(f, value, config);
+                setField(f, value, config, false);
             } catch (NoSuchFieldException e) {
                 error("Failed to update " + option.getName() + ": " + e);
             }
@@ -248,11 +248,15 @@ public class AxolotlClientAnnotationConfig {
     }
 
     private <T> void setField(Field field, T value, Object configObject) {
+        setField(field, value, configObject, true);
+    }
+
+    private <T> void setField(Field field, T value, Object configObject, boolean invokeListeners) {
         if (isRegistered(configObject)) {
             try {
                 field.setAccessible(true);
                 field.set(configObject, value);
-                if (field.isAnnotationPresent(Listener.class)) {
+                if (invokeListeners && field.isAnnotationPresent(Listener.class)) {
                     Listener annotation = field.getAnnotation(Listener.class);
                     try {
                         var method = field.getDeclaringClass().getDeclaredMethod(annotation.value(), field.getType());

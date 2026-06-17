@@ -1,6 +1,9 @@
-package io.github.axolotlclient.AxolotlClientConfig.annotation;
+package com.example.annotation;
 
 import com.google.gson.JsonObject;
+import io.github.axolotlclient.AxolotlClientConfig.annotation.AxolotlClientAnnotationConfig;
+import io.github.axolotlclient.AxolotlClientConfig.annotation.ConfigInstance;
+import io.github.axolotlclient.AxolotlClientConfig.annotation.NamingScheme;
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.Config;
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.FloatRange;
 import io.github.axolotlclient.AxolotlClientConfig.annotation.annotations.Listener;
@@ -43,7 +46,7 @@ public class AnnotationConfigExample implements ClientModInitializer {
         }
     }
 
-    @Config(name = "axolotlclient-annotationconfig-test")
+    @Config(name = "axolotlclient-annotationconfig-example")
     @SerializedName.RenameAll(NamingScheme.SNAKE_CASE)
     public static class ExampleConfigClass {
         public boolean exampleBoolean = true;
@@ -83,7 +86,7 @@ public class AnnotationConfigExample implements ClientModInitializer {
         void onBooleanTwoChange(boolean value) {
             System.out.println("Woah you changed this value to "+value+"!");
             System.out.println("Config values: ");
-            System.out.println(((ExampleConfigManager)AxolotlClientConfig.getInstance().getConfigManager("axolotlclient-annotationconfig-test")).getSerializedJson());
+            System.out.println(((ExampleConfigManager)AxolotlClientConfig.getInstance().getConfigManager("axolotlclient-annotationconfig-example")).getSerializedJson());
         }
     }
 }
